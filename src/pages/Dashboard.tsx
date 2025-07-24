@@ -89,7 +89,11 @@ const Dashboard = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {forms.map((form) => (
-              <Card key={form.id} className="hover:shadow-lg transition-shadow">
+              <Card 
+                key={form.id} 
+                className="hover:shadow-lg transition-shadow cursor-pointer group" 
+                onClick={() => window.open(`/form/${form.id}`, '_blank')}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
@@ -103,21 +107,39 @@ const Dashboard = () => {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="ml-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="ml-2"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`/form/${form.id}`, '_blank');
+                          }}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/form-builder?id=${form.id}`)}>
+                        <DropdownMenuItem 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/form-builder?id=${form.id}`);
+                          }}
+                        >
                           <Edit2 className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          onClick={() => handleDeleteForm(form.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteForm(form.id);
+                          }}
                           className="text-destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
