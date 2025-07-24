@@ -1,28 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowRight, FileText, Zap, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { features } from "@/constants/features"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 
 const Landing = () => {
-  const navigate = useNavigate();
-
-  const features = [
-    {
-      icon: <FileText className="h-8 w-8" />,
-      title: "Easy Form Creation",
-      description: "Create beautiful forms with drag-and-drop simplicity"
-    },
-    {
-      icon: <Zap className="h-8 w-8" />,
-      title: "Multi-Step Forms", 
-      description: "Build complex workflows with multiple steps"
-    },
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Secure & Reliable",
-      description: "Your data is safe with enterprise-grade security"
-    }
-  ];
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
@@ -30,7 +13,7 @@ const Landing = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            FormCraft
+            Promptly
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Create stunning forms and surveys with ease. Build multi-step workflows, 
@@ -38,7 +21,7 @@ const Landing = () => {
           </p>
           <Button 
             size="lg" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/login')}
             className="text-lg px-8 py-6 h-auto"
           >
             Get Started
@@ -67,7 +50,7 @@ const Landing = () => {
           </p>
           <Button 
             size="lg"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/login')}
             className="text-lg px-8 py-6 h-auto"
           >
             Start Building Forms
@@ -76,7 +59,7 @@ const Landing = () => {
         </Card>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Landing;
+export default Landing
