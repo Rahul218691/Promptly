@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
   ArrowLeft, 
@@ -145,6 +146,8 @@ const FormBuilder = () => {
     updatedSteps[stepIndex] = { ...updatedSteps[stepIndex], ...updates };
     setSteps(updatedSteps);
   };
+
+  const progress = ((previewStep + 1) / steps.length) * 100;
 
   return (
     <div className="min-h-screen bg-background">
@@ -388,140 +391,189 @@ const FormBuilder = () => {
 
       {/* Preview Dialog */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{formTitle}</DialogTitle>
-            {formDescription && (
-              <p className="text-muted-foreground">{formDescription}</p>
-            )}
-          </DialogHeader>
-          
-          {steps.length > 1 && (
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex gap-2">
-                {steps.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`h-2 w-8 rounded-full ${
-                      index === previewStep ? 'bg-primary' : 'bg-muted'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-sm text-muted-foreground">
-                Step {previewStep + 1} of {steps.length}
-              </span>
-            </div>
-          )}
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
+          <div className="min-h-[80vh] bg-gradient-to-br from-background to-muted/20">
+            <div className="container mx-auto px-4 py-8">
+              <div className="max-w-2xl mx-auto">
+                {/* Header */}
+                <Card className="mb-6">
+                  <CardHeader className="text-center">
+                    <CardTitle className="text-2xl md:text-3xl">{formTitle}</CardTitle>
+                    {formDescription && (
+                      <p className="text-muted-foreground text-lg">{formDescription}</p>
+                    )}
+                  </CardHeader>
+                </Card>
 
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium">{steps[previewStep]?.title}</h3>
-              <p className="text-muted-foreground">{steps[previewStep]?.description}</p>
-            </div>
+                {/* Progress Bar */}
+                {steps.length > 1 && (
+                  <Card className="mb-6">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">
+                          Step {previewStep + 1} of {steps.length}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {Math.round(progress)}% Complete
+                        </span>
+                      </div>
+                      <Progress value={progress} className="w-full" />
+                    </CardContent>
+                  </Card>
+                )}
 
-            <div className="space-y-4">
-              {steps[previewStep]?.fields.map((field) => (
-                <div key={field.id} className="space-y-2">
-                  <Label className="flex items-center gap-1">
-                    {field.label}
-                    {field.required && <span className="text-destructive">*</span>}
-                  </Label>
+                {/* Current Step */}
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-xl">{steps[previewStep]?.title}</CardTitle>
+                    <p className="text-muted-foreground">
+                      {steps[previewStep]?.description}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {steps[previewStep]?.fields.map((field) => (
+                      <div key={field.id} className="space-y-2">
+                        <Label className="flex items-center gap-1 text-base">
+                          {field.label}
+                          {field.required && <span className="text-destructive">*</span>}
+                        </Label>
+                        
+                        {field.type === 'text' && (
+                          <Input
+                            placeholder={field.placeholder}
+                            className="text-base"
+                          />
+                        )}
+                        
+                        {field.type === 'email' && (
+                          <Input
+                            type="email"
+                            placeholder={field.placeholder}
+                            className="text-base"
+                          />
+                        )}
+                        
+                        {field.type === 'phone' && (
+                          <Input
+                            type="tel"
+                            placeholder={field.placeholder}
+                            className="text-base"
+                          />
+                        )}
+                        
+                        {field.type === 'date' && (
+                          <Input
+                            type="date"
+                            className="text-base"
+                          />
+                        )}
+                        
+                        {field.type === 'textarea' && (
+                          <Textarea
+                            placeholder={field.placeholder}
+                            rows={4}
+                            className="text-base resize-none"
+                          />
+                        )}
+                        
+                        {field.type === 'select' && (
+                          <Select>
+                            <SelectTrigger className="text-base">
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {field.options?.map((option, index) => (
+                                <SelectItem key={index} value={option} className="text-base">
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                        
+                        {field.type === 'radio' && (
+                          <RadioGroup className="space-y-3">
+                            {field.options?.map((option, index) => (
+                              <div key={index} className="flex items-center space-x-3">
+                                <RadioGroupItem 
+                                  value={option} 
+                                  id={`${field.id}-${index}`}
+                                  className="mt-0.5"
+                                />
+                                <Label 
+                                  htmlFor={`${field.id}-${index}`}
+                                  className="text-base font-normal cursor-pointer"
+                                >
+                                  {option}
+                                </Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        )}
+                        
+                        {field.type === 'checkbox' && (
+                          <div className="space-y-3">
+                            {field.options?.map((option, index) => (
+                              <div key={index} className="flex items-center space-x-3">
+                                <Checkbox 
+                                  id={`${field.id}-${index}`}
+                                  className="mt-0.5"
+                                />
+                                <Label 
+                                  htmlFor={`${field.id}-${index}`}
+                                  className="text-base font-normal cursor-pointer"
+                                >
+                                  {option}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {field.type === 'rating' && (
+                          <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className="h-8 w-8 cursor-pointer text-muted-foreground hover:text-yellow-400 transition-colors"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Navigation */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => setPreviewStep(Math.max(0, previewStep - 1))}
+                    disabled={previewStep === 0}
+                    className="order-2 sm:order-1"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
                   
-                  {field.type === 'text' && (
-                    <Input placeholder={field.placeholder} />
-                  )}
-                  
-                  {field.type === 'email' && (
-                    <Input type="email" placeholder={field.placeholder} />
-                  )}
-                  
-                  {field.type === 'phone' && (
-                    <Input type="tel" placeholder={field.placeholder} />
-                  )}
-                  
-                  {field.type === 'date' && (
-                    <Input type="date" />
-                  )}
-                  
-                  {field.type === 'textarea' && (
-                    <Textarea placeholder={field.placeholder} rows={3} />
-                  )}
-                  
-                  {field.type === 'select' && (
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {field.options?.map((option, index) => (
-                          <SelectItem key={index} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  
-                  {field.type === 'radio' && (
-                    <RadioGroup>
-                      {field.options?.map((option, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <RadioGroupItem value={option} id={`${field.id}-${index}`} />
-                          <Label htmlFor={`${field.id}-${index}`}>{option}</Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  )}
-                  
-                  {field.type === 'checkbox' && (
-                    <div className="space-y-2">
-                      {field.options?.map((option, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <Checkbox id={`${field.id}-${index}`} />
-                          <Label htmlFor={`${field.id}-${index}`}>{option}</Label>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {field.type === 'rating' && (
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className="h-6 w-6 cursor-pointer hover:fill-yellow-400 hover:text-yellow-400"
-                        />
-                      ))}
-                    </div>
+                  {previewStep === steps.length - 1 ? (
+                    <Button className="order-1 sm:order-2">
+                      Submit Form
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => setPreviewStep(Math.min(steps.length - 1, previewStep + 1))}
+                      disabled={previewStep === steps.length - 1}
+                      className="order-1 sm:order-2"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
                   )}
                 </div>
-              ))}
-            </div>
-
-            {steps.length > 1 && (
-              <div className="flex justify-between pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setPreviewStep(Math.max(0, previewStep - 1))}
-                  disabled={previewStep === 0}
-                >
-                  <ChevronLeft className="h-4 w-4 mr-1" />
-                  Previous
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (previewStep < steps.length - 1) {
-                      setPreviewStep(previewStep + 1);
-                    }
-                  }}
-                  disabled={previewStep === steps.length - 1}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
               </div>
-            )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
