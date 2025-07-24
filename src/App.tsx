@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import GuestRoute from './routes/GuestRoute';
+import PrivateRoute from './routes/PrivateRoute';
 
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -21,11 +23,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/form-builder" element={<FormBuilder />} />
-          <Route path="/form/:formId" element={<FormView />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<GuestRoute><Landing /></GuestRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/form-builder" element={<PrivateRoute><FormBuilder /></PrivateRoute>} />
+          <Route path="/form/:formId" element={<PrivateRoute><FormView /></PrivateRoute>} />
+          <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
