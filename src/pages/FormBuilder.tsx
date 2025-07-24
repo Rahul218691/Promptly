@@ -18,7 +18,9 @@ import {
   Phone,
   Star,
   Eye,
-  Save
+  Save,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -30,6 +32,14 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface FormField {
   id: string;
@@ -52,6 +62,8 @@ const FormBuilder = () => {
   const [formTitle, setFormTitle] = useState("Untitled Form");
   const [formDescription, setFormDescription] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewStep, setPreviewStep] = useState(0);
   const [steps, setSteps] = useState<FormStep[]>([
     {
       id: '1',
@@ -153,7 +165,14 @@ const FormBuilder = () => {
               </div>
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" className="flex-1 sm:flex-none">
+              <Button 
+                variant="outline" 
+                className="flex-1 sm:flex-none"
+                onClick={() => {
+                  setPreviewStep(0);
+                  setShowPreview(true);
+                }}
+              >
                 <Eye className="mr-2 h-4 w-4" />
                 Preview
               </Button>
@@ -366,6 +385,146 @@ const FormBuilder = () => {
           </div>
         </div>
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{formTitle}</DialogTitle>
+            {formDescription && (
+              <p className="text-muted-foreground">{formDescription}</p>
+            )}
+          </DialogHeader>
+          
+          {steps.length > 1 && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex gap-2">
+                {steps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-2 w-8 rounded-full ${
+                      index === previewStep ? 'bg-primary' : 'bg-muted'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground">
+                Step {previewStep + 1} of {steps.length}
+              </span>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium">{steps[previewStep]?.title}</h3>
+              <p className="text-muted-foreground">{steps[previewStep]?.description}</p>
+            </div>
+
+            <div className="space-y-4">
+              {steps[previewStep]?.fields.map((field) => (
+                <div key={field.id} className="space-y-2">
+                  <Label className="flex items-center gap-1">
+                    {field.label}
+                    {field.required && <span className="text-destructive">*</span>}
+                  </Label>
+                  
+                  {field.type === 'text' && (
+                    <Input placeholder={field.placeholder} />
+                  )}
+                  
+                  {field.type === 'email' && (
+                    <Input type="email" placeholder={field.placeholder} />
+                  )}
+                  
+                  {field.type === 'phone' && (
+                    <Input type="tel" placeholder={field.placeholder} />
+                  )}
+                  
+                  {field.type === 'date' && (
+                    <Input type="date" />
+                  )}
+                  
+                  {field.type === 'textarea' && (
+                    <Textarea placeholder={field.placeholder} rows={3} />
+                  )}
+                  
+                  {field.type === 'select' && (
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.options?.map((option, index) => (
+                          <SelectItem key={index} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  
+                  {field.type === 'radio' && (
+                    <RadioGroup>
+                      {field.options?.map((option, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <RadioGroupItem value={option} id={`${field.id}-${index}`} />
+                          <Label htmlFor={`${field.id}-${index}`}>{option}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  )}
+                  
+                  {field.type === 'checkbox' && (
+                    <div className="space-y-2">
+                      {field.options?.map((option, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <Checkbox id={`${field.id}-${index}`} />
+                          <Label htmlFor={`${field.id}-${index}`}>{option}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {field.type === 'rating' && (
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className="h-6 w-6 cursor-pointer hover:fill-yellow-400 hover:text-yellow-400"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {steps.length > 1 && (
+              <div className="flex justify-between pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setPreviewStep(Math.max(0, previewStep - 1))}
+                  disabled={previewStep === 0}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (previewStep < steps.length - 1) {
+                      setPreviewStep(previewStep + 1);
+                    }
+                  }}
+                  disabled={previewStep === steps.length - 1}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
