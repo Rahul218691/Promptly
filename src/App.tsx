@@ -13,6 +13,8 @@ const FormBuilder = lazy(() => import('./pages/FormBuilder'));
 const FormView = lazy(() => import('./pages/FormView'));
 const Landing = lazy(() => import('./pages/Landing'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Review = lazy(() => import('./pages/Review'));
+const ReviewFormList = lazy(() => import('./pages/FormReviewList'))
 
 const queryClient = new QueryClient();
 
@@ -24,10 +26,13 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<GuestRoute><Landing /></GuestRoute>} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/form-builder" element={<PrivateRoute><FormBuilder /></PrivateRoute>} />
-          <Route path="/form/:formId" element={<PrivateRoute><FormView /></PrivateRoute>} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/form-builder" element={<FormBuilder />} />
+          <Route path="/form/:formId" element={<FormView />} />
           <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+          <Route path="/review/:formId" element={<Review />} />
+          <Route path='/review/list' element={<ReviewFormList />} />
+          {/* Catch-all route for 404 Not Found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
